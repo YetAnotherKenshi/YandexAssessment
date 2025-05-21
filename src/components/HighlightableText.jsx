@@ -9,7 +9,7 @@ const HighlightableText = () => {
     "This is a sample text. You can highlight portions of this text.";
 
   const handleHighlight = () => {
-    setError(""); // Clear previous error
+    setError("");
 
     const selection = window.getSelection();
     if (!selection || selection.toString().trim() === "") {
@@ -21,18 +21,16 @@ const HighlightableText = () => {
     const startOffset = range.startOffset;
     const endOffset = range.endOffset;
 
-    // Check if selection is within the same parent (required for clean highlighting)
     if (!textRef.current.contains(range.commonAncestorContainer)) {
       setError("Selection must be within the specified text.");
       return;
     }
 
-    // Collision detection
     for (const highlight of highlights) {
       if (
-        (startOffset >= highlight.start && startOffset < highlight.end) || // Start inside
-        (endOffset > highlight.start && endOffset <= highlight.end) || // End inside
-        (startOffset <= highlight.start && endOffset >= highlight.end) // Overlaps entirely
+        (startOffset >= highlight.start && startOffset < highlight.end) ||
+        (endOffset > highlight.start && endOffset <= highlight.end) ||
+        (startOffset <= highlight.start && endOffset >= highlight.end)
       ) {
         setError(
           "Selection overlaps an existing highlight. Please choose a different area."
@@ -41,10 +39,8 @@ const HighlightableText = () => {
       }
     }
 
-    // Add the new highlight
     setHighlights([...highlights, { start: startOffset, end: endOffset }]);
 
-    // Clear selection
     selection.removeAllRanges();
   };
 
@@ -54,11 +50,9 @@ const HighlightableText = () => {
     let lastIndex = 0;
     const elements = [];
 
-    // Sort highlights by starting position
     const sortedHighlights = [...highlights].sort((a, b) => a.start - b.start);
 
     sortedHighlights.forEach((highlight, index) => {
-      // Add unhighlighted text before the highlight
       if (highlight.start > lastIndex) {
         elements.push(
           <span key={`text-${index}`}>
@@ -67,7 +61,6 @@ const HighlightableText = () => {
         );
       }
 
-      // Add the highlighted text
       elements.push(
         <span
           key={`highlight-${index}`}
@@ -80,7 +73,6 @@ const HighlightableText = () => {
       lastIndex = highlight.end;
     });
 
-    // Add remaining unhighlighted text
     if (lastIndex < textContent.length) {
       elements.push(
         <span key={`text-end`}>{textContent.slice(lastIndex)}</span>
